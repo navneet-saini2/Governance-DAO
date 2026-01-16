@@ -1,66 +1,50 @@
-## Foundry
+# SimpleDAO - Professional Governance System
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+A gas-efficient, secure Decentralized Autonomous Organization (DAO) built with **Foundry** and **OpenZeppelin**. This project implements a proposal-vote-execution lifecycle using snapshot-based voting power to prevent common governance exploits.
 
-Foundry consists of:
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
 
-## Documentation
+## 🚀 Features
 
-https://book.getfoundry.sh/
+* **Snapshot Voting**: Utilizes `ERC20Votes` to calculate voting power based on historical balances, making the system immune to **Flash Loan attacks**.
+* **Quorum Protection**: Ensures a minimum level of participation (`1,000 GOV`) is reached before a proposal can pass.
+* **Custom Errors**: Uses Solidity 0.8.26 custom errors for optimized gas usage and better debugging.
+* **Foundry Native**: Optimized for the Foundry development toolchain with clear remappings and submodule management.
 
-## Usage
+## 🛠 Architecture
 
-### Build
+### 1. GovToken.sol
+The governance token (`GOV`) leverages OpenZeppelin's `ERC20Votes` extension. This contract maintains "checkpoints" of user balances every time a transfer occurs, allowing the DAO to query a user's balance at any specific block height in the past.
 
-```shell
-$ forge build
-```
+### 2. SimpleDAO.sol
+The core engine that handles:
+* **Proposing**: Any user can propose an arbitrary transaction (target address, ETH value, and encoded data).
+* **Voting**: Token holders vote 'Yes' or 'No'. Power is determined by the balance they held at the block the proposal was created.
+* **Execution**: Once the voting duration expires, if the quorum is met and the majority is achieved, anyone can trigger the execution.
 
-### Test
+---
 
-```shell
-$ forge test
-```
+## 💻 Getting Started
 
-### Format
+### Prerequisites
+* [Foundry](https://getfoundry.sh/) installed.
+* [VS Code](https://code.visualstudio.com/) with the Solidity extension.
 
-```shell
-$ forge fmt
-```
+### Installation
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/navneet-saini2/Governance-DAO
+   cd SimpleDAO
 
-### Gas Snapshots
+2. Install dependencies:
+   ```bash
+    forge install OpenZeppelin/openzeppelin-contracts
 
-```shell
-$ forge snapshot
-```
+3. Build & Test
+Compile the contracts to ensure everything is linked correctly:
+    ```bash
+    forge build
 
-### Anvil
-
-```shell
-$ anvil
-```
-
-### Deploy
-
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
+4. Run the test suite:
+   ```Bash
+   forge test
