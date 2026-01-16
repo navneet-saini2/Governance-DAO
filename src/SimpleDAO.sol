@@ -2,10 +2,7 @@
 pragma solidity ^0.8.26;
 
 interface IVotes {
-    function getPastVotes(
-        address account,
-        uint256 timepoint
-    ) external view returns (uint256);
+    function getPastVotes(address account, uint256 timepoint) external view returns (uint256);
 }
 
 contract SimpleDAO {
@@ -22,12 +19,7 @@ contract SimpleDAO {
                                    EVENTS
     //////////////////////////////////////////////////////////////*/
     event ProposalCreated(uint256 indexed proposalId, address proposer);
-    event VoteCast(
-        uint256 indexed proposalId,
-        address voter,
-        bool support,
-        uint256 weight
-    );
+    event VoteCast(uint256 indexed proposalId, address voter, bool support, uint256 weight);
     event ProposalExecuted(uint256 indexed proposalId);
 
     /*//////////////////////////////////////////////////////////////
@@ -57,11 +49,7 @@ contract SimpleDAO {
         govToken = IVotes(_govToken);
     }
 
-    function createProposal(
-        address target,
-        uint256 value,
-        bytes calldata data
-    ) external returns (uint256) {
+    function createProposal(address target, uint256 value, bytes calldata data) external returns (uint256) {
         proposalCount++;
         proposals[proposalCount] = Proposal({
             proposer: msg.sender,
@@ -87,10 +75,7 @@ contract SimpleDAO {
         if (hasVoted[proposalId][msg.sender]) revert AlreadyVoted();
 
         // Use getPastVotes to prevent Flash Loan attacks
-        uint256 votingPower = govToken.getPastVotes(
-            msg.sender,
-            proposal.startBlock
-        );
+        uint256 votingPower = govToken.getPastVotes(msg.sender, proposal.startBlock);
         require(votingPower > 0, "NO VOTING POWER");
 
         hasVoted[proposalId][msg.sender] = true;
@@ -117,9 +102,7 @@ contract SimpleDAO {
 
         proposal.executed = true;
 
-        (bool success, ) = proposal.target.call{value: proposal.value}(
-            proposal.data
-        );
+        (bool success,) = proposal.target.call{value: proposal.value}(proposal.data);
         require(success, "EXECUTION FAILED");
 
         emit ProposalExecuted(proposalId);
